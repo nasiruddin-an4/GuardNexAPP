@@ -3,11 +3,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
     const router = useRouter();
     const { user, messages } = useApp();
-    const scrollRef = useRef<ScrollView>(null);
+    const scrollRef = useRef(null);
     const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
 
     const carouselBanners = [
@@ -34,7 +35,6 @@ export default function HomeScreen() {
         },
     ];
 
-    // Auto-play carousel
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentCarouselIndex((prev) => (prev + 1) % 3);
@@ -42,7 +42,6 @@ export default function HomeScreen() {
         return () => clearInterval(interval);
     }, []);
 
-    // Scroll carousel when index changes
     useEffect(() => {
         scrollRef.current?.scrollTo({
             x: currentCarouselIndex * 320,
@@ -88,71 +87,55 @@ export default function HomeScreen() {
     ];
 
     return (
-        <View className="flex-1 bg-white">
-            {/* Fixed/Sticky Top Bar */}
-            <View className="bg-gradient-to-b from-blue-600 to-blue-500 px-6 pt-6 pb-4 shadow-lg">
-                {/* Top Bar with Profile and Icons */}
+        <SafeAreaView className="flex-1 bg-gray-50">
+
+            {/* TOP BAR — No Gradient */}
+            <View className="px-6 pt-4 pb-4">
                 <View className="flex-row justify-between items-center">
-                    {/* Left: User Profile */}
+
+                    {/* USER INFO */}
                     <View className="flex-row items-center gap-3 flex-1">
-                        <View className="bg-white rounded-full w-12 h-12 items-center justify-center border-2 border-white shadow-lg">
-                            <Text className="text-blue-600 text-xl font-bold">
+                        <View className="bg-blue-600 rounded-full w-12 h-12 items-center justify-center border-2 border-white shadow-lg">
+                            <Text className="text-white text-xl font-bold">
                                 {(user?.name || 'U').charAt(0).toUpperCase()}
                             </Text>
                         </View>
+
                         <View className="flex-1">
-                            <Text className="text-white text-xs font-medium opacity-80">
-                                Welcome back
-                            </Text>
-                            <Text className="text-white text-lg font-bold">
+                            <Text className="text-blue-700 text-lg font-bold">
                                 {user?.name || 'User'}
+                            </Text>
+                            <Text className="text-blue-700 text-xs opacity-80">
+                                GuardNex
                             </Text>
                         </View>
                     </View>
 
-                    {/* Right: Notification and Search Icons */}
+                    {/* ICONS */}
                     <View className="flex-row items-center gap-3">
-                        <TouchableOpacity
-                            className="bg-white bg-opacity-20 rounded-full w-10 h-10 items-center justify-center active:bg-opacity-30"
-                            onPress={() => {/* Handle search */ }}
-                        >
-                            <MaterialCommunityIcons name="magnify" size={22} color="white" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            className="bg-white bg-opacity-20 rounded-full w-10 h-10 items-center justify-center active:bg-opacity-30"
-                            onPress={() => {/* Handle notifications */ }}
-                        >
+                        <TouchableOpacity className="bg-white bg-opacity-20 rounded-full w-10 h-10 items-center justify-center">
                             <MaterialCommunityIcons name="bell-outline" size={22} color="white" />
-                            {/* Notification Badge */}
                             <View className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2" />
                         </TouchableOpacity>
+
+                        <TouchableOpacity className="bg-white bg-opacity-20 rounded-full w-10 h-10 items-center justify-center">
+                            <MaterialCommunityIcons name="magnify" size={22} color="white" />
+                        </TouchableOpacity>
                     </View>
+
                 </View>
             </View>
 
-            {/* Scrollable Content */}
+            {/* MAIN SCROLL */}
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                {/* Protection Status Banner */}
-                <View className="bg-gradient-to-b from-blue-600 to-blue-500 px-6 pb-6">
-                    <View className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-                        <View className="flex-row items-center gap-3 mb-3">
-                            <View className="bg-green-400 w-3 h-3 rounded-full" />
-                            <Text className="text-white font-semibold">Protection Active</Text>
-                        </View>
-                        <Text className="text-blue-100 text-sm">
-                            Your device is protected against spam and phishing
-                        </Text>
-                    </View>
-                </View>
 
-                {/* Carousel Banners */}
+                {/* CAROUSEL */}
                 <View className="mt-6 mb-6">
                     <ScrollView
                         ref={scrollRef}
                         horizontal
                         pagingEnabled
                         showsHorizontalScrollIndicator={false}
-                        scrollEventThrottle={16}
                         className="ml-6"
                     >
                         {carouselBanners.map((banner) => (
@@ -161,124 +144,110 @@ export default function HomeScreen() {
                                     style={{ backgroundColor: banner.color }}
                                     className="rounded-2xl p-6 h-40 justify-between"
                                 >
-                                    <View className="flex-row items-start justify-between">
+                                    <View className="flex-row justify-between">
                                         <View className="flex-1">
-                                            <Text className="text-white font-bold text-lg mb-1">
-                                                {banner.title}
-                                            </Text>
-                                            <Text className="text-white text-opacity-90 text-sm leading-4">
-                                                {banner.subtitle}
-                                            </Text>
+                                            <Text className="text-white font-bold text-lg">{banner.title}</Text>
+                                            <Text className="text-white text-sm opacity-90 mt-1">{banner.subtitle}</Text>
                                         </View>
+
                                         <View className="bg-white bg-opacity-20 rounded-lg p-3">
-                                            <MaterialCommunityIcons
-                                                name={banner.icon as any}
-                                                size={24}
-                                                color="white"
-                                            />
+                                            <MaterialCommunityIcons name={banner.icon} size={24} color="white" />
                                         </View>
                                     </View>
-                                    <View className="bg-white bg-opacity-20 h-1 rounded-full overflow-hidden">
-                                        <View className="bg-white h-full" style={{ width: '100%' }} />
+
+                                    {/* STATIC SLIDER BAR */}
+                                    <View className="bg-white bg-opacity-20 h-1 rounded-full">
+                                        <View className="bg-white h-full w-full" />
                                     </View>
                                 </View>
                             </View>
                         ))}
                     </ScrollView>
 
-                    {/* Carousel Dots */}
+                    {/* DOTS */}
                     <View className="flex-row justify-center gap-2 mt-4">
                         {carouselBanners.map((_, index) => (
                             <TouchableOpacity
                                 key={index}
                                 onPress={() => setCurrentCarouselIndex(index)}
-                                className={`rounded-full transition-all ${index === currentCarouselIndex
+                                className={`${index === currentCarouselIndex
                                     ? 'bg-blue-600 w-8 h-2'
                                     : 'bg-gray-300 w-2 h-2'
-                                    }`}
+                                    } rounded-full`}
                             />
                         ))}
                     </View>
                 </View>
+
+                {/* YOUR STATISTICS */}
                 <View className="px-6 py-8">
+
                     <Text className="text-gray-900 text-lg font-bold mb-4">Your Statistics</Text>
 
-                    <View className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-4">
-                        <View className="flex-row items-center justify-between mb-6">
+                    {/* Total Scanned — No Gradient */}
+                    <View className="bg-blue-50 rounded-2xl p-6 mb-4">
+                        <View className="flex-row justify-between mb-6">
                             <View>
-                                <Text className="text-gray-600 text-sm font-medium mb-1">Total Scanned</Text>
+                                <Text className="text-gray-600 text-sm">Total Scanned</Text>
                                 <Text className="text-4xl font-bold text-blue-600">
                                     {stats.totalScanned}
                                 </Text>
                             </View>
+
                             <View className="bg-blue-600 rounded-2xl p-4">
                                 <MaterialCommunityIcons name="shield-check" size={40} color="white" />
                             </View>
                         </View>
-                        <View className="bg-blue-600 bg-opacity-10 h-1 rounded-full overflow-hidden">
-                            <View
-                                className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full"
-                                style={{ width: '65%' }}
-                            />
+
+                        <View className="bg-blue-200 h-1 rounded-full overflow-hidden">
+                            <View className="bg-blue-600 h-full" style={{ width: '65%' }} />
                         </View>
+
                         <Text className="text-gray-600 text-xs mt-2">
-                            You&apos;re protecting yourself daily
+                            You're protecting yourself daily
                         </Text>
                     </View>
 
-                    {/* Stats Grid */}
+                    {/* GRID */}
                     <View className="gap-3 mb-2">
+
+                        {/* Spam */}
                         <View className="flex-row gap-3">
-                            {/* Spam Detected */}
-                            <TouchableOpacity
-                                onPress={() => router.push('/(tabs)/history' as any)}
-                                className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
-                            >
+
+                            <TouchableOpacity className="flex-1 bg-white rounded-2xl p-4 border">
                                 <View className="flex-row items-center gap-3">
                                     <View className="bg-red-100 rounded-xl p-3">
-                                        <MaterialCommunityIcons
-                                            name="alert-circle"
-                                            size={24}
-                                            color="#ef4444"
-                                        />
+                                        <MaterialCommunityIcons name="alert-circle" size={24} color="#ef4444" />
                                     </View>
+
                                     <View className="flex-1">
-                                        <Text className="text-gray-600 text-xs font-medium">Spam Blocked</Text>
-                                        <Text className="text-2xl font-bold text-gray-900 mt-1">
-                                            {stats.spamDetected}
-                                        </Text>
+                                        <Text className="text-gray-600 text-xs">Spam Blocked</Text>
+                                        <Text className="text-2xl font-bold text-gray-900">{stats.spamDetected}</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>
 
-                            {/* Legitimate */}
-                            <TouchableOpacity
-                                onPress={() => router.push('/(tabs)/history' as any)}
-                                className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 active:bg-gray-50"
-                            >
+                            {/* Safe */}
+                            <TouchableOpacity className="flex-1 bg-white rounded-2xl p-4 border">
                                 <View className="flex-row items-center gap-3">
                                     <View className="bg-green-100 rounded-xl p-3">
-                                        <MaterialCommunityIcons
-                                            name="check-circle"
-                                            size={24}
-                                            color="#10b981"
-                                        />
+                                        <MaterialCommunityIcons name="check-circle" size={24} color="#10b981" />
                                     </View>
+
                                     <View className="flex-1">
-                                        <Text className="text-gray-600 text-xs font-medium">Safe Messages</Text>
-                                        <Text className="text-2xl font-bold text-gray-900 mt-1">
-                                            {stats.legitimate}
-                                        </Text>
+                                        <Text className="text-gray-600 text-xs">Safe Messages</Text>
+                                        <Text className="text-2xl font-bold text-gray-900">{stats.legitimate}</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>
+
                         </View>
 
                         {/* Accuracy */}
-                        <View className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-100">
-                            <View className="flex-row items-center justify-between">
+                        <View className="bg-purple-50 border rounded-2xl p-4">
+                            <View className="flex-row justify-between">
                                 <View>
-                                    <Text className="text-gray-600 text-xs font-medium mb-1">Detection Accuracy</Text>
+                                    <Text className="text-gray-600 text-xs">Detection Accuracy</Text>
                                     <Text className="text-3xl font-bold text-purple-600">{stats.accuracy}%</Text>
                                 </View>
                                 <View className="bg-purple-600 rounded-full w-16 h-16 items-center justify-center">
@@ -286,10 +255,11 @@ export default function HomeScreen() {
                                 </View>
                             </View>
                         </View>
+
                     </View>
                 </View>
 
-                {/* Features Section */}
+                {/* FEATURE LIST */}
                 <View className="px-6 pb-8">
                     <Text className="text-gray-900 text-lg font-bold mb-4">Quick Features</Text>
 
@@ -297,56 +267,28 @@ export default function HomeScreen() {
                         {features.map((feature) => (
                             <TouchableOpacity
                                 key={feature.id}
-                                onPress={() => router.push(feature.route as any)}
-                                className="bg-white rounded-2xl p-4 flex-row items-center gap-4 border border-gray-100 active:bg-gray-50"
+                                onPress={() => router.push(feature.route)}
+                                className="bg-white rounded-2xl p-4 flex-row items-center gap-4 border"
                             >
                                 <View
                                     style={{ backgroundColor: feature.color + '20' }}
                                     className="rounded-xl p-3 w-14 h-14 items-center justify-center"
                                 >
-                                    <MaterialCommunityIcons
-                                        name={feature.icon as any}
-                                        size={28}
-                                        color={feature.color}
-                                    />
+                                    <MaterialCommunityIcons name={feature.icon} size={28} color={feature.color} />
                                 </View>
 
                                 <View className="flex-1">
-                                    <Text className="text-gray-900 font-bold text-base">
-                                        {feature.title}
-                                    </Text>
-                                    <Text className="text-gray-500 text-xs mt-1">
-                                        {feature.description}
-                                    </Text>
+                                    <Text className="text-gray-900 font-bold">{feature.title}</Text>
+                                    <Text className="text-gray-500 text-xs">{feature.description}</Text>
                                 </View>
 
-                                <MaterialCommunityIcons
-                                    name="chevron-right"
-                                    size={24}
-                                    color="#d1d5db"
-                                />
+                                <MaterialCommunityIcons name="chevron-right" size={24} color="#d1d5db" />
                             </TouchableOpacity>
                         ))}
                     </View>
                 </View>
 
-                {/* Info Banner */}
-                <View className="px-6 pb-8">
-                    <View className="bg-blue-50 rounded-2xl p-5 border border-blue-200 flex-row gap-3">
-                        <View className="bg-blue-600 rounded-full w-10 h-10 items-center justify-center flex-shrink-0 mt-1">
-                            <MaterialCommunityIcons name="lightbulb" size={20} color="white" />
-                        </View>
-                        <View className="flex-1">
-                            <Text className="text-blue-900 font-bold text-sm mb-1">
-                                Pro Tip
-                            </Text>
-                            <Text className="text-blue-800 text-xs leading-4">
-                                Regularly check your message history to identify patterns and stay protected against evolving spam threats.
-                            </Text>
-                        </View>
-                    </View>
-                </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
