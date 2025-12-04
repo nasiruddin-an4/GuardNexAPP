@@ -11,7 +11,7 @@ export default function SettingsScreen() {
     const { user, updateUser, resetApp } = useApp();
     const [notifications, setNotifications] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
-    
+
     // Modal states
     const [showNameModal, setShowNameModal] = useState(false);
     const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -35,7 +35,7 @@ export default function SettingsScreen() {
                     style: 'destructive',
                     onPress: async () => {
                         await resetApp();
-                        router.replace('/(auth)/onboarding' as any);
+                        router.replace('/(auth)/signin' as any);
                     },
                 },
             ]

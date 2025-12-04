@@ -110,11 +110,11 @@ export default function HomeScreen() {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                             {/* USER INFO */}
                             <View style={{ flex: 1 }}>
+                                <Text style={{ fontSize: 24, color: '#ffffff', fontWeight: 'bold', marginTop: 4 }}>
+                                    Hi {user?.name || 'User'}
+                                </Text>
                                 <Text style={{ fontSize: 14, color: '#dbeafe', fontWeight: '500' }}>
                                     {getGreeting()}
-                                </Text>
-                                <Text style={{ fontSize: 24, color: '#ffffff', fontWeight: 'bold', marginTop: 4 }}>
-                                    {user?.name || 'User'}
                                 </Text>
                             </View>
 
