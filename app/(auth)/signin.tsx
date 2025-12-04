@@ -5,18 +5,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Dimensions,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const { width, height } = Dimensions.get('window');
 
 interface ValidationErrors {
     email?: string;
@@ -30,12 +27,8 @@ export default function SignInScreen() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [emailFocused, setEmailFocused] = useState(false);
-    const [passwordFocused, setPasswordFocused] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
-    const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
     const [biometricAvailable, setBiometricAvailable] = useState(false);
-    const [biometricType, setBiometricType] = useState<'fingerprint' | 'faceId' | 'iris' | 'none'>('none');
 
     useEffect(() => {
         checkBiometrics();
@@ -44,14 +37,12 @@ export default function SignInScreen() {
     const checkBiometrics = async () => {
         const biometricCheck = await checkBiometricAvailability();
         setBiometricAvailable(biometricCheck.isAvailable);
-        setBiometricType(biometricCheck.biometricType);
     };
 
     const handleBiometricLogin = async () => {
         const result = await authenticateWithBiometrics();
 
         if (result.success) {
-            // Simulate successful biometric login
             setIsLoading(true);
             setTimeout(async () => {
                 await setUser({
@@ -92,22 +83,13 @@ export default function SignInScreen() {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleFieldBlur = (fieldName: string) => {
-        setTouchedFields(prev => new Set(prev).add(fieldName));
-        validateForm();
-    };
-
     const handleSignIn = async () => {
-        // Mark all fields as touched
-        setTouchedFields(new Set(['email', 'password']));
-
         if (!validateForm()) {
             return;
         }
 
         setIsLoading(true);
 
-        // Simulate API call
         setTimeout(async () => {
             const userName = email.split('@')[0] || 'User';
             await setUser({
@@ -123,16 +105,10 @@ export default function SignInScreen() {
         }, 1500);
     };
 
-    const handleSocialLogin = (provider: string) => {
-        // Handle social login
-        console.log(`Login with ${provider}`);
-    };
-
     return (
-        <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
+        <View style={{ flex: 1, backgroundColor: '#5B4CCC' }}>
             <LinearGradient
-                colors={['#1e293b', '#0f172a', '#020617']}
-                locations={[0, 0.5, 1]}
+                colors={['#5B4CCC', '#6B5DD3', '#5B4CCC']}
                 style={{ flex: 1 }}
             >
                 <SafeAreaView style={{ flex: 1 }}>
@@ -140,219 +116,137 @@ export default function SignInScreen() {
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                         style={{ flex: 1 }}
                     >
+                        {/* Header */}
+                        <View style={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: 20 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <TouchableOpacity
+                                    onPress={() => router.back()}
+                                    style={{ marginRight: 16 }}
+                                    activeOpacity={0.7}
+                                >
+                                    <MaterialCommunityIcons name="chevron-left" size={32} color="#ffffff" />
+                                </TouchableOpacity>
+                                <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#ffffff' }}>
+                                    Sign in
+                                </Text>
+                            </View>
+                        </View>
+
                         <ScrollView
-                            contentContainerStyle={{
-                                flexGrow: 1,
-                                paddingHorizontal: 24,
-                            }}
+                            style={{ flex: 1 }}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
                         >
-                            {/* Back Button */}
-                            <TouchableOpacity
-                                onPress={() => router.back()}
+                            {/* White Card Container */}
+                            <View
                                 style={{
-                                    marginTop: 8,
-                                    marginBottom: 20,
-                                    alignSelf: 'flex-start',
+                                    backgroundColor: '#ffffff',
+                                    borderTopLeftRadius: 30,
+                                    borderTopRightRadius: 30,
+                                    minHeight: '100%',
+                                    paddingHorizontal: 24,
+                                    paddingTop: 32,
+                                    paddingBottom: 40,
                                 }}
-                                activeOpacity={0.7}
                             >
-                                <View
-                                    style={{
-                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                        borderRadius: 12,
-                                        padding: 10,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <MaterialCommunityIcons name="arrow-left" size={20} color="#e2e8f0" />
-                                </View>
-                            </TouchableOpacity>
-
-                            {/* Header Section */}
-                            <View style={{ marginBottom: 40, marginTop: 20 }}>
-                                {/* Logo/Icon */}
-                                <View style={{ alignItems: 'center', marginBottom: 24 }}>
-                                    <LinearGradient
-                                        colors={['#3b82f6', '#2563eb', '#1d4ed8']}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 1 }}
-                                        style={{
-                                            width: 80,
-                                            height: 80,
-                                            borderRadius: 24,
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            shadowColor: '#3b82f6',
-                                            shadowOffset: { width: 0, height: 8 },
-                                            shadowOpacity: 0.5,
-                                            shadowRadius: 16,
-                                            elevation: 10,
-                                        }}
-                                    >
-                                        <MaterialCommunityIcons name="shield-check" size={40} color="#ffffff" />
-                                    </LinearGradient>
-                                </View>
-
-                                <Text
-                                    style={{
-                                        fontSize: 36,
-                                        fontWeight: 'bold',
-                                        color: '#ffffff',
-                                        textAlign: 'center',
-                                        marginBottom: 8,
-                                        letterSpacing: -0.5,
-                                    }}
-                                >
+                                {/* Welcome Text */}
+                                <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#5B4CCC', marginBottom: 8 }}>
                                     Welcome Back
                                 </Text>
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        color: '#94a3b8',
-                                        textAlign: 'center',
-                                        lineHeight: 24,
-                                    }}
-                                >
-                                    Sign in to continue protecting your messages
+                                <Text style={{ fontSize: 16, color: '#666666', marginBottom: 40 }}>
+                                    Hello there, sign in to continue
                                 </Text>
-                            </View>
 
-                            {/* Sign In Form */}
-                            <View style={{ gap: 20, marginBottom: 32 }}>
-                                {/* Email Input */}
-                                <View>
-                                    <Text
-                                        style={{
-                                            fontSize: 14,
-                                            fontWeight: '600',
-                                            color: '#e2e8f0',
-                                            marginBottom: 10,
-                                        }}
-                                    >
-                                        Email Address
-                                    </Text>
+                                {/* Illustration */}
+                                <View style={{ alignItems: 'center', marginBottom: 40, position: 'relative' }}>
+                                    {/* Background Circle */}
                                     <View
                                         style={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                            borderRadius: 16,
-                                            borderWidth: 2,
-                                            borderColor: errors.email && touchedFields.has('email')
-                                                ? '#ef4444'
-                                                : emailFocused
-                                                    ? '#3b82f6'
-                                                    : 'rgba(255, 255, 255, 0.1)',
-                                            flexDirection: 'row',
+                                            width: 200,
+                                            height: 200,
+                                            borderRadius: 100,
+                                            backgroundColor: '#E8E4F8',
                                             alignItems: 'center',
-                                            paddingHorizontal: 16,
-                                            shadowColor: emailFocused ? '#3b82f6' : '#000',
-                                            shadowOffset: { width: 0, height: 4 },
-                                            shadowOpacity: emailFocused ? 0.3 : 0.1,
-                                            shadowRadius: 8,
-                                            elevation: emailFocused ? 4 : 2,
+                                            justifyContent: 'center',
                                         }}
                                     >
-                                        <MaterialCommunityIcons
-                                            name="email-outline"
-                                            size={22}
-                                            color={emailFocused ? '#3b82f6' : '#64748b'}
-                                            style={{ marginRight: 12 }}
-                                        />
-                                        <TextInput
+                                        {/* Lock Icon */}
+                                        <View
                                             style={{
-                                                flex: 1,
-                                                paddingVertical: 16,
-                                                fontSize: 16,
-                                                color: '#ffffff',
+                                                width: 80,
+                                                height: 100,
+                                                backgroundColor: '#5B4CCC',
+                                                borderRadius: 12,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
                                             }}
-                                            placeholder="your.email@example.com"
-                                            placeholderTextColor="#475569"
-                                            value={email}
-                                            onChangeText={(text) => {
-                                                setEmail(text);
-                                                if (errors.email) validateForm();
-                                            }}
-                                            keyboardType="email-address"
-                                            autoCapitalize="none"
-                                            autoComplete="email"
-                                            onFocus={() => setEmailFocused(true)}
-                                            onBlur={() => {
-                                                setEmailFocused(false);
-                                                handleFieldBlur('email');
-                                            }}
-                                        />
-                                    </View>
-                                    {errors.email && touchedFields.has('email') && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-                                            <MaterialCommunityIcons name="alert-circle" size={14} color="#ef4444" />
-                                            <Text style={{ fontSize: 13, color: '#ef4444', marginLeft: 4 }}>
-                                                {errors.email}
-                                            </Text>
+                                        >
+                                            <MaterialCommunityIcons name="lock" size={50} color="#ffffff" />
                                         </View>
+                                    </View>
+
+                                    {/* Decorative Dots */}
+                                    <View style={{ position: 'absolute', top: 20, right: 60, width: 20, height: 20, borderRadius: 10, backgroundColor: '#5B4CCC' }} />
+                                    <View style={{ position: 'absolute', top: 60, right: 20, width: 24, height: 24, borderRadius: 12, backgroundColor: '#FF6B9D' }} />
+                                    <View style={{ position: 'absolute', bottom: 40, right: 30, width: 18, height: 18, borderRadius: 9, backgroundColor: '#4FC3F7' }} />
+                                    <View style={{ position: 'absolute', bottom: 60, left: 30, width: 22, height: 22, borderRadius: 11, backgroundColor: '#FFB74D' }} />
+                                    <View style={{ position: 'absolute', top: 80, left: 20, width: 16, height: 16, borderRadius: 8, backgroundColor: '#4DD0E1' }} />
+                                </View>
+
+                                {/* Email Input */}
+                                <View style={{ marginBottom: 16 }}>
+                                    <TextInput
+                                        style={{
+                                            backgroundColor: '#ffffff',
+                                            borderWidth: 1,
+                                            borderColor: '#E0E0E0',
+                                            borderRadius: 25,
+                                            paddingHorizontal: 20,
+                                            paddingVertical: 16,
+                                            fontSize: 16,
+                                            color: '#333333',
+                                        }}
+                                        placeholder="Enter your email"
+                                        placeholderTextColor="#BDBDBD"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        autoComplete="email"
+                                    />
+                                    {errors.email && (
+                                        <Text style={{ fontSize: 12, color: '#FF6B9D', marginTop: 4, marginLeft: 20 }}>
+                                            {errors.email}
+                                        </Text>
                                     )}
                                 </View>
 
                                 {/* Password Input */}
-                                <View>
-                                    <Text
-                                        style={{
-                                            fontSize: 14,
-                                            fontWeight: '600',
-                                            color: '#e2e8f0',
-                                            marginBottom: 10,
-                                        }}
-                                    >
-                                        Password
-                                    </Text>
+                                <View style={{ marginBottom: 8 }}>
                                     <View
                                         style={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                            borderRadius: 16,
-                                            borderWidth: 2,
-                                            borderColor: errors.password && touchedFields.has('password')
-                                                ? '#ef4444'
-                                                : passwordFocused
-                                                    ? '#3b82f6'
-                                                    : 'rgba(255, 255, 255, 0.1)',
+                                            backgroundColor: '#ffffff',
+                                            borderWidth: 1,
+                                            borderColor: '#E0E0E0',
+                                            borderRadius: 25,
+                                            paddingHorizontal: 12,
+                                            paddingVertical: 8,
                                             flexDirection: 'row',
                                             alignItems: 'center',
-                                            paddingHorizontal: 16,
-                                            shadowColor: passwordFocused ? '#3b82f6' : '#000',
-                                            shadowOffset: { width: 0, height: 4 },
-                                            shadowOpacity: passwordFocused ? 0.3 : 0.1,
-                                            shadowRadius: 8,
-                                            elevation: passwordFocused ? 4 : 2,
                                         }}
                                     >
-                                        <MaterialCommunityIcons
-                                            name="lock-outline"
-                                            size={22}
-                                            color={passwordFocused ? '#3b82f6' : '#64748b'}
-                                            style={{ marginRight: 12 }}
-                                        />
                                         <TextInput
                                             style={{
                                                 flex: 1,
-                                                paddingVertical: 16,
                                                 fontSize: 16,
-                                                color: '#ffffff',
+                                                color: '#333333',
                                             }}
-                                            placeholder="Enter your password"
-                                            placeholderTextColor="#475569"
+                                            placeholder="Password"
+                                            placeholderTextColor="#BDBDBD"
                                             value={password}
-                                            onChangeText={(text) => {
-                                                setPassword(text);
-                                                if (errors.password) validateForm();
-                                            }}
+                                            onChangeText={setPassword}
                                             secureTextEntry={!showPassword}
                                             autoCapitalize="none"
-                                            onFocus={() => setPasswordFocused(true)}
-                                            onBlur={() => {
-                                                setPasswordFocused(false);
-                                                handleFieldBlur('password');
-                                            }}
                                         />
                                         <TouchableOpacity
                                             onPress={() => setShowPassword(!showPassword)}
@@ -361,17 +255,14 @@ export default function SignInScreen() {
                                             <MaterialCommunityIcons
                                                 name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                                                 size={22}
-                                                color="#64748b"
+                                                color="#BDBDBD"
                                             />
                                         </TouchableOpacity>
                                     </View>
-                                    {errors.password && touchedFields.has('password') && (
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-                                            <MaterialCommunityIcons name="alert-circle" size={14} color="#ef4444" />
-                                            <Text style={{ fontSize: 13, color: '#ef4444', marginLeft: 4 }}>
-                                                {errors.password}
-                                            </Text>
-                                        </View>
+                                    {errors.password && (
+                                        <Text style={{ fontSize: 12, color: '#FF6B9D', marginTop: 4, marginLeft: 20 }}>
+                                            {errors.password}
+                                        </Text>
                                     )}
                                 </View>
 
@@ -379,153 +270,30 @@ export default function SignInScreen() {
                                 <TouchableOpacity
                                     onPress={() => router.push('/(auth)/forgot-password' as any)}
                                     activeOpacity={0.7}
-                                    style={{ alignSelf: 'flex-end' }}
+                                    style={{ alignSelf: 'flex-end', marginBottom: 32 }}
                                 >
-                                    <Text
-                                        style={{
-                                            fontSize: 14,
-                                            fontWeight: '600',
-                                            color: '#3b82f6',
-                                        }}
-                                    >
-                                        Forgot Password?
+                                    <Text style={{ fontSize: 14, color: '#BDBDBD' }}>
+                                        Forgot your password ?
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
 
-                            {/* Sign In Button */}
-                            <TouchableOpacity
-                                onPress={handleSignIn}
-                                activeOpacity={0.8}
-                                disabled={isLoading}
-                                style={{ marginBottom: 24 }}
-                            >
-                                <LinearGradient
-                                    colors={['#3b82f6', '#2563eb', '#1d4ed8']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    style={{
-                                        paddingVertical: 18,
-                                        borderRadius: 16,
-                                        shadowColor: '#3b82f6',
-                                        shadowOffset: { width: 0, height: 8 },
-                                        shadowOpacity: 0.4,
-                                        shadowRadius: 12,
-                                        elevation: 6,
-                                    }}
-                                >
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                                        {isLoading ? (
-                                            <Text
-                                                style={{
-                                                    color: '#ffffff',
-                                                    fontSize: 17,
-                                                    fontWeight: 'bold',
-                                                }}
-                                            >
-                                                Signing In...
-                                            </Text>
-                                        ) : (
-                                            <>
-                                                <Text
-                                                    style={{
-                                                        color: '#ffffff',
-                                                        fontSize: 17,
-                                                        fontWeight: 'bold',
-                                                        marginRight: 8,
-                                                    }}
-                                                >
-                                                    Sign In
-                                                </Text>
-                                                <MaterialCommunityIcons name="arrow-right" size={20} color="#ffffff" />
-                                            </>
-                                        )}
-                                    </View>
-                                </LinearGradient>
-                            </TouchableOpacity>
-
-                            {/* Divider */}
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginBottom: 24,
-                                }}
-                            >
-                                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
-                                <Text
-                                    style={{
-                                        marginHorizontal: 16,
-                                        fontSize: 14,
-                                        color: '#64748b',
-                                        fontWeight: '500',
-                                    }}
-                                >
-                                    Or continue with
-                                </Text>
-                                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
-                            </View>
-
-                            {/* Social Login Buttons */}
-                            <View style={{ gap: 12, marginBottom: 32 }}>
-                                {/* Google */}
+                                {/* Sign In Button */}
                                 <TouchableOpacity
-                                    onPress={() => handleSocialLogin('Google')}
-                                    activeOpacity={0.7}
+                                    onPress={handleSignIn}
+                                    activeOpacity={0.8}
+                                    disabled={isLoading}
+                                    style={{ marginBottom: 32 }}
                                 >
                                     <View
                                         style={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                            borderRadius: 16,
-                                            borderWidth: 1,
-                                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            backgroundColor: '#E8E4F8',
+                                            borderRadius: 25,
                                             paddingVertical: 16,
-                                            flexDirection: 'row',
                                             alignItems: 'center',
-                                            justifyContent: 'center',
                                         }}
                                     >
-                                        <MaterialCommunityIcons name="google" size={24} color="#ffffff" />
-                                        <Text
-                                            style={{
-                                                marginLeft: 12,
-                                                fontSize: 16,
-                                                fontWeight: '600',
-                                                color: '#ffffff',
-                                            }}
-                                        >
-                                            Continue with Google
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                                {/* Apple */}
-                                <TouchableOpacity
-                                    onPress={() => handleSocialLogin('Apple')}
-                                    activeOpacity={0.7}
-                                >
-                                    <View
-                                        style={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                            borderRadius: 16,
-                                            borderWidth: 1,
-                                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                                            paddingVertical: 16,
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                        }}
-                                    >
-                                        <MaterialCommunityIcons name="apple" size={24} color="#ffffff" />
-                                        <Text
-                                            style={{
-                                                marginLeft: 12,
-                                                fontSize: 16,
-                                                fontWeight: '600',
-                                                color: '#ffffff',
-                                            }}
-                                        >
-                                            Continue with Apple
+                                        <Text style={{ fontSize: 18, fontWeight: '600', color: '#5B4CCC' }}>
+                                            {isLoading ? 'Signing in...' : 'Sign in'}
                                         </Text>
                                     </View>
                                 </TouchableOpacity>
@@ -535,77 +303,39 @@ export default function SignInScreen() {
                                     <TouchableOpacity
                                         onPress={handleBiometricLogin}
                                         activeOpacity={0.7}
+                                        style={{ alignItems: 'center', marginBottom: 32 }}
                                     >
-                                        <LinearGradient
-                                            colors={['#8b5cf6', '#7c3aed', '#6d28d9']}
-                                            start={{ x: 0, y: 0 }}
-                                            end={{ x: 1, y: 0 }}
+                                        <View
                                             style={{
-                                                borderRadius: 16,
-                                                borderWidth: 1,
-                                                borderColor: 'rgba(139, 92, 246, 0.3)',
-                                                paddingVertical: 16,
-                                                flexDirection: 'row',
+                                                width: 80,
+                                                height: 80,
+                                                borderRadius: 40,
+                                                backgroundColor: '#ffffff',
+                                                borderWidth: 3,
+                                                borderColor: '#5B4CCC',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                shadowColor: '#8b5cf6',
-                                                shadowOffset: { width: 0, height: 4 },
-                                                shadowOpacity: 0.3,
-                                                shadowRadius: 8,
-                                                elevation: 4,
                                             }}
                                         >
-                                            <MaterialCommunityIcons
-                                                name={biometricType === 'faceId' ? 'face-recognition' : 'fingerprint'}
-                                                size={24}
-                                                color="#ffffff"
-                                            />
-                                            <Text
-                                                style={{
-                                                    marginLeft: 12,
-                                                    fontSize: 16,
-                                                    fontWeight: '600',
-                                                    color: '#ffffff',
-                                                }}
-                                            >
-                                                {biometricType === 'faceId' ? 'Sign in with Face ID' : 'Sign in with Fingerprint'}
-                                            </Text>
-                                        </LinearGradient>
+                                            <MaterialCommunityIcons name="fingerprint" size={48} color="#5B4CCC" />
+                                        </View>
                                     </TouchableOpacity>
                                 )}
-                            </View>
 
-                            {/* Sign Up Link */}
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    paddingBottom: 24,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        fontSize: 15,
-                                        color: '#94a3b8',
-                                    }}
-                                >
-                                    Don&apos;t have an account?{' '}
-                                </Text>
-                                <TouchableOpacity
-                                    onPress={() => router.push('/(auth)/signup' as any)}
-                                    activeOpacity={0.7}
-                                >
-                                    <Text
-                                        style={{
-                                            fontSize: 15,
-                                            fontWeight: 'bold',
-                                            color: '#3b82f6',
-                                        }}
-                                    >
-                                        Sign Up
+                                {/* Sign Up Link */}
+                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 15, color: '#666666' }}>
+                                        Don&apos;t have an account?{' '}
                                     </Text>
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => router.push('/(auth)/signup' as any)}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#5B4CCC' }}>
+                                            Sign Up
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </ScrollView>
                     </KeyboardAvoidingView>
